@@ -212,6 +212,8 @@ a.stat:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -18px rgba(0
 .inv-paper__tot div { display: flex; justify-content: space-between; color: var(--mut); }
 .inv-paper__tot .big { margin-top: 6px; padding: 10px 12px; border-radius: 8px; background: var(--red); color: #fff; font-weight: 700; font-size: 0.9rem; }
 
+.dbwarn { margin-bottom: 20px; padding: 14px 18px; border-radius: 14px; background: #fff4d1; border: 1px solid #f3d27a; color: #6b4e00; line-height: 1.5; }
+
 /* league table editor */
 .ltable { display: flex; flex-direction: column; gap: 6px; overflow-x: auto; }
 .ltable__head, .ltable__row { display: grid; grid-template-columns: 28px 92px minmax(180px, 1fr) repeat(6, 58px) 44px 40px 32px; gap: 8px; align-items: center; min-width: 760px; }

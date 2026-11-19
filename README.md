@@ -50,24 +50,39 @@ You can also choose your own username and password before the first run with env
 - **Website Content:** club details, contact info, social links, the hero slides on the homepage and the photo gallery.
 - **Invoices:** create invoices, preview them live, then use *Save & download PDF*. Invoice numbering, VAT, currency and bank details are set in Settings.
 
-## Putting it online
+## Putting it online with Vercel
+
+The site is ready for Vercel. The `api/` folder and `vercel.json` handle the server part.
+
+1. **Import the GitHub repo** in Vercel. It detects Vite on its own, so you don't need to change any build settings.
+2. **Connect a database.** In your Vercel project, open **Storage** → **Create / Connect** → choose **Upstash for Redis** (the free plan is fine) and connect it to the project. This is where players, matches, scores, the league table and invoices are saved.
+3. **Connect photo storage.** In **Storage**, also create a **Blob** store and connect it. This lets you upload player photos and logos from the admin.
+4. **Optional, but recommended:** under **Settings → Environment Variables**, add these:
+   - `ADMIN_PASSWORD`: the first admin password. Otherwise it is `HopeFC2022!`.
+   - `JWT_SECRET`: any long random text.
+5. **Redeploy** (Deployments → ⋯ → Redeploy) so the new settings take effect.
+
+If the database isn't connected yet, the website still shows. The admin displays a yellow warning because changes can't be saved until it is.
+
+How live scores reach visitors on Vercel: each visitor's page checks for updates every 3 seconds. Vercel shares one answer between all visitors, so the database is barely used even when many people are watching a match.
+
+### Other hosts (Render, Railway, a VPS…)
 
 ```bash
 npm run build    # creates the optimised site in /dist
 npm start        # one server runs the website + API on port 4000
 ```
 
-This works with any Node host, for example Render, Railway or a VPS. Set these environment variables:
+Without Redis, data is saved in `server/data/db.json` and uploads in `server/data/uploads`. **Back up that folder.**
 
-| Variable         | Purpose                                         |
-|------------------|-------------------------------------------------|
-| `PORT`           | Port to listen on (default 4000)                |
-| `JWT_SECRET`     | Long random string used to sign admin sessions  |
-| `ADMIN_USER`     | Username for the first admin account            |
-| `ADMIN_PASSWORD` | Password for the first admin account            |
-| `DATA_DIR`       | Where the database and uploads are stored (default `server/data`) |
-
-All data is saved in `server/data/db.json`. Uploaded images are saved in `server/data/uploads`. **Back up that folder.**
+| Variable | Purpose |
+|---|---|
+| `PORT` | Port to listen on (default 4000) |
+| `JWT_SECRET` | Long random string used to sign admin sessions |
+| `ADMIN_USER` / `ADMIN_PASSWORD` | First admin account |
+| `DATA_DIR` | Where `db.json` and uploads are stored (file mode) |
+| `KV_REST_API_URL` / `KV_REST_API_TOKEN` | Upstash Redis. Vercel adds these when you connect it |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob for uploads. Vercel adds this when you connect it |
 
 ## Project structure
 
@@ -75,9 +90,12 @@ All data is saved in `server/data/db.json`. Uploaded images are saved in `server
 hope/
 ├── index.html              Page shell (fonts, favicon)
 ├── public/images/          Crest, player photos, cut-outs, gallery
+├── api/index.js            Vercel serverless entry (runs server/app.js)
+├── vercel.json             Vercel routing
 ├── server/
-│   ├── index.js            Express API, login, live updates (SSE), uploads
-│   ├── db.js               JSON file database
+│   ├── app.js              Express API: login, live match, uploads, data
+│   ├── index.js            Runs the app as a normal Node server (local / VPS)
+│   ├── db.js               Storage: Upstash Redis on Vercel, JSON file locally
 │   └── seed.js             Starting data for a fresh install
 └── src/
     ├── components/         Hero, live match card, squad carousel, fixtures, gallery…

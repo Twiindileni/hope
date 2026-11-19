@@ -91,6 +91,11 @@ function Shell({ user, onLogout }) {
       </aside>
       <button className="aside__toggle" onClick={() => setMenu((v) => !v)} aria-label="Menu">☰</button>
       <main className="amain">
+        {data.storage === 'memory' && (
+          <div className="dbwarn">
+            <b>Database not connected.</b> The website works, but changes made here are not saved. In Vercel, open this project → <b>Storage</b> → connect <b>Upstash for Redis</b> (and <b>Blob</b> for photo uploads), then redeploy.
+          </div>
+        )}
         <Routes>
           <Route index element={<Overview />} />
           <Route path="live" element={<LiveControl />} />

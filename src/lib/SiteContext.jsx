@@ -3,45 +3,64 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 const SiteContext = createContext(null);
 
 /**
- * Loads the public site data once, then keeps it fresh through the
- * server-sent event stream: `live` events carry the live match, `site`
- * events tell us something changed in the admin so we re-fetch.
+ * Loads the public site data, then checks /api/live every few seconds.
+ * Every save on the server bumps a revision number; when it changes we
+ * re-fetch, so the live scoreboard and any admin edits appear on their own.
  */
 export function SiteProvider({ children }) {
   const [data, setData] = useState(null);
   const [live, setLive] = useState(null);
   const [offset, setOffset] = useState(0); // server time − client time
   const [error, setError] = useState(null);
-  const timer = useRef();
+  const rev = useRef(0);
+  const loading = useRef(false);
 
   const load = useCallback(async () => {
+    if (loading.current) return;
+    loading.current = true;
     try {
-      const res = await fetch('/api/site');
-      if (!res.ok) throw new Error('Could not load site data');
-      const json = await res.json();
+      const res = await fetch('/api/site', { cache: 'no-store' });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.content) throw new Error(json.error || 'Could not load the club website');
+      rev.current = json.rev || 0;
       setData(json);
       setLive(json.live);
       setOffset(json.serverTime - Date.now());
       setError(null);
     } catch (e) {
       setError(e.message);
+    } finally {
+      loading.current = false;
     }
   }, []);
 
   useEffect(() => {
     load();
-    const es = new EventSource('/api/live/stream');
-    es.addEventListener('live', (e) => {
-      const { match, serverTime } = JSON.parse(e.data);
-      setLive(match);
-      setOffset(serverTime - Date.now());
-    });
-    es.addEventListener('site', () => {
-      clearTimeout(timer.current);
-      timer.current = setTimeout(load, 250);
-    });
-    es.onerror = () => { /* EventSource reconnects automatically */ };
-    return () => { es.close(); clearTimeout(timer.current); };
+
+    // Check for live-score / content changes every few seconds while the tab is visible.
+    const poll = async () => {
+      if (document.hidden) return;
+      try {
+        const res = await fetch('/api/live');
+        if (!res.ok) return;
+        const snap = await res.json();
+        if (snap.rev > rev.current) {
+          setLive(snap.match);
+          setOffset(snap.serverTime - Date.now());
+          load();
+        }
+      } catch { /* offline — try again next tick */ }
+    };
+    const id = setInterval(poll, 3000);
+    const onVisible = () => !document.hidden && poll();
+    const onChanged = () => load(); // the admin just saved something
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('hopefc:changed', onChanged);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('hopefc:changed', onChanged);
+    };
   }, [load]);
 
   return (

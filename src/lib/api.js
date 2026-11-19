@@ -17,6 +17,7 @@ export async function api(path, { method = 'GET', body, raw } = {}) {
     window.dispatchEvent(new Event('hopefc:logout'));
   }
   if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+  if (method !== 'GET' && path !== '/auth/login') window.dispatchEvent(new Event('hopefc:changed'));
   return data;
 }
 
