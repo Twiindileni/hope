@@ -1,0 +1,11 @@
+node_modules/
+dist/
+server/data/
+*.log
+.DS_Store
+
+# Original full-size photos and source graphics (the site uses the resized copies in public/images)
+/*.JPG
+/*.jpg
+/*.jpeg
+/*.png
