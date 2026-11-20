@@ -2,7 +2,7 @@
   "name": "hope-from-football-club",
   "private": true,
   "version": "1.0.0",
-  "description": "Official website of Hope From Football Club \u2014 players, live match centre, admin dashboard and invoices.",
+  "description": "Official website of Hope From Football Club — players, live match centre, admin dashboard and invoices.",
   "type": "module",
   "scripts": {
     "dev": "concurrently -k -n api,web -c red,yellow \"node --watch server/index.js\" \"vite\"",
@@ -21,7 +21,8 @@
     "multer": "^2.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0"
+    "react-router-dom": "^6.28.0",
+    "redis": "^4.7.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

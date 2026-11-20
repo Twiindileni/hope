@@ -13,13 +13,41 @@ import bcrypt from 'bcryptjs';
 import { Redis } from '@upstash/redis';
 import { seed, seedMatches, seedTeams, seedTable, SEED_VERSION } from './seed.js';
 
-const REDIS_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-const redis = REDIS_URL && REDIS_TOKEN ? new Redis({ url: REDIS_URL, token: REDIS_TOKEN }) : null;
+// Vercel names these variables differently depending on how the database was
+// connected (and may add a custom prefix such as "STORAGE_"), so look for any of them.
+const env = process.env;
+const findEnv = (...suffixes) => {
+  for (const sfx of suffixes) if (env[sfx]) return env[sfx];
+  for (const sfx of suffixes) {
+    const k = Object.keys(env).find((n) => n.endsWith('_' + sfx) && env[n]);
+    if (k) return env[k];
+  }
+  return null;
+};
+const REST_URL = findEnv('KV_REST_API_URL', 'UPSTASH_REDIS_REST_URL');
+const REST_TOKEN = findEnv('KV_REST_API_TOKEN', 'UPSTASH_REDIS_REST_TOKEN');
+// "Redis" from the Vercel Marketplace (Redis Cloud) only gives a redis:// connection string.
+const TCP_URL = REST_URL && REST_TOKEN ? null : findEnv('REDIS_URL', 'KV_URL');
+
+let redis = null;
+if (REST_URL && REST_TOKEN) {
+  redis = new Redis({ url: REST_URL, token: REST_TOKEN });
+} else if (TCP_URL) {
+  const { createClient } = await import('redis');
+  const client = createClient({ url: TCP_URL, socket: { connectTimeout: 8000 } });
+  client.on('error', (e) => console.error('Redis error', e.message));
+  let ready = null;
+  const conn = () => (ready ||= client.connect().catch((e) => { ready = null; throw e; }));
+  redis = {
+    async get(k) { await conn(); const v = await client.get(k); return v == null ? null : JSON.parse(v); },
+    async set(k, v) { await conn(); return client.set(k, JSON.stringify(v)); },
+  };
+}
 const KEY = 'hopefc:db';
 const LIVE_KEY = 'hopefc:live';
 
 const MODE = redis ? 'redis' : process.env.VERCEL ? 'memory' : 'file';
+if (MODE === 'memory') console.warn('No Redis database found — admin changes will NOT be saved on Vercel.');
 
 const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(process.cwd(), 'server', 'data'));
 const DB_FILE = path.join(DATA_DIR, 'db.json');
@@ -105,14 +133,20 @@ export const db = {
     return state;
   },
 
-  /** Queue a write of the current data. `flush()` waits for it. */
+  /** Queue a write of the current data. `flush()` waits for it and fails if the write failed. */
+  saves: 0,
   save() {
+    db.saves += 1;
     state.rev = (state.rev || 0) + 1;
     const json = JSON.stringify(state);
-    pending = pending.then(() => writeRaw(json)).catch((e) => console.error('DB write failed', e));
-    return pending;
+    const write = pending.catch(() => {}).then(() => writeRaw(json));
+    pending = write;
+    write.catch((e) => console.error('DB write failed', e));
+    return write;
   },
   flush: () => pending,
+  /** Wait for queued writes, ignoring failures from earlier requests. */
+  settle: () => pending.catch(() => {}),
 
   /** Small, fast read used by visitors' browsers to check for live updates. */
   async liveSnapshot() {

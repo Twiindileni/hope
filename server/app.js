@@ -26,8 +26,20 @@ app.use((req, res, next) => {
 app.use('/api', async (req, res, next) => {
   try {
     await db.refresh();
+    if (db.mode === 'memory' && req.method !== 'GET' && !req.path.startsWith('/auth/login')) {
+      return res.status(503).json({ error: 'Not saved: no database is connected to this Vercel project. Connect Upstash for Redis in Vercel → Storage, then redeploy.' });
+    }
     const json = res.json.bind(res);
-    res.json = (body) => { db.flush().then(() => json(body), () => json(body)); return res; };
+    const savesBefore = db.saves;
+    res.json = (body) => {
+      if (db.saves === savesBefore) { db.settle().then(() => json(body)); return res; }
+      db.flush().then(() => json(body), (e) => {
+        if (res.statusCode >= 400) return json(body);
+        res.status(500);
+        json({ error: `Not saved — the database rejected the change (${e?.message || 'write failed'}). Please try again.` });
+      });
+      return res;
+    };
     next();
   } catch (e) {
     console.error(e);
