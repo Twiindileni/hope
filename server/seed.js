@@ -30,7 +30,7 @@ export const seedPlayers = positions.map((position, i) => ({
 // ---------------------------------------------------------------------------
 const T = (id, name, logo = '') => ({ id, name, logo });
 export const seedTeams = [
-  T('t-gunners', 'Mighty Gunners Ladies FC'),
+  T('t-gunners', 'Mighty Gunners Ladies FC', '/images/teams/mighty-gunners.png'),
   T('t-unam', 'UNAM Bokkies FC', '/images/teams/unam.png'),
   T('t-ongos', 'FC Ongos Ladies', '/images/teams/fc-ongos.png'),
   T('t-arrows', 'Arrows Ladies FC', '/images/teams/arrows.png'),
@@ -41,7 +41,7 @@ export const seedTeams = [
   T('t-stars', 'African Stars Queens FC', '/images/teams/african-stars.png'),
   T('t-vpower', 'V-Power Angels FC', '/images/teams/vpower-angels.png'),
   T('t-hope', 'Hope From FC', '/images/crest-sm.png'),
-  T('t-desert', 'Desert Queens FC'),
+  T('t-desert', 'Desert Queens FC', '/images/teams/desert-queens.png'),
 ];
 
 const R = (teamId, p, w, d, l, f, a) => ({ teamId, p, w, d, l, f, a });
@@ -76,7 +76,7 @@ export const seedMatches = [
   M('m04', 4, 'Desert Queens FC', '', '2026-11-21T11:00:00+02:00', 'Tamariskia Stadium, Swakopmund', false, 'scheduled'),
 ];
 
-export const SEED_VERSION = 2;
+export const SEED_VERSION = 3;
 
 export const seed = {
   version: SEED_VERSION,

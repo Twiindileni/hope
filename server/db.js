@@ -122,6 +122,15 @@ function migrate(s) {
     }
     if (s.content.league === "Women's Super League") s.content.league = seed.content.league;
   }
+  if (v < 3) {
+    // New crests for Mighty Gunners and Desert Queens — only fill logos that are still empty.
+    const logos = [['t-gunners', /gunners/i, '/images/teams/mighty-gunners.png'], ['t-desert', /desert queens/i, '/images/teams/desert-queens.png']];
+    for (const [id, re, logo] of logos) {
+      const t = (s.teams || []).find((x) => x.id === id || re.test(x.name));
+      if (t && !t.logo) t.logo = logo;
+      for (const m of s.matches || []) if (re.test(m.opponent || '') && !m.opponentLogo) m.opponentLogo = logo;
+    }
+  }
   s.version = SEED_VERSION;
 }
 
