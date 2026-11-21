@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useSite, useReveal } from '../lib/SiteContext.jsx';
 import Hero from '../components/Hero.jsx';
 import Ticker from '../components/Ticker.jsx';
+import Lineup from '../components/Lineup.jsx';
 import Squad from '../components/Squad.jsx';
 import Fixtures from '../components/Fixtures.jsx';
 import Standings from '../components/Standings.jsx';
@@ -34,6 +35,7 @@ export default function Home() {
     <>
       <Hero />
       <Ticker />
+      <Lineup />
       <Squad />
       <Fixtures />
       <Standings />

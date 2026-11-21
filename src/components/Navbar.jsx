@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSite } from '../lib/SiteContext.jsx';
+import { useLineupMatch } from './Lineup.jsx';
 
 const LINKS = [
   ['Squad', '#squad'],
@@ -12,6 +13,7 @@ const LINKS = [
 
 export default function Navbar() {
   const { data, live } = useSite();
+  const lineupMatch = useLineupMatch();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -40,6 +42,7 @@ export default function Navbar() {
 
       <nav className="nav__links" aria-label="Main">
         <span className="nav__line" aria-hidden />
+        {lineupMatch && <a href="#lineup" onClick={go}>Lineup</a>}
         {LINKS.map(([label, href]) => (
           <a key={href} href={href} onClick={go}>{label}</a>
         ))}

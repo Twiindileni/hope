@@ -636,3 +636,107 @@ p { margin: 0; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* =====================================================================
+   Matchday lineup (2D pitch) — used on the website and in the admin
+   ===================================================================== */
+.lineup { position: relative; padding: 110px 0 100px; color: #fff; background:
+  radial-gradient(900px 500px at 85% 0%, rgba(208, 16, 43, 0.35), transparent 60%),
+  radial-gradient(700px 500px at 0% 100%, rgba(255, 212, 0, 0.08), transparent 60%), #120307; }
+.lineup .eyebrow { color: var(--gold); }
+.lineup__fixture { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.lineup__fixture small { color: rgba(255, 255, 255, 0.6); font-size: 0.82rem; text-align: right; }
+.lineup__teams { display: flex; align-items: center; gap: 16px; }
+.lineup__teams span { display: flex; align-items: center; gap: 10px; }
+.lineup__teams img, .lineup__teams .tlogo { width: 40px; height: 40px; object-fit: contain; }
+.lineup__teams b { font-weight: 700; font-size: 1rem; }
+.lineup__teams em { font-style: normal; font-family: var(--display); font-size: 1.5rem; color: var(--gold); padding: 2px 14px; border-radius: 10px; background: rgba(255, 255, 255, 0.07); }
+
+.lineup__bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.lineup__formation { font-size: 0.82rem; color: rgba(255, 255, 255, 0.65); text-transform: uppercase; letter-spacing: 0.14em; }
+.lineup__formation b { margin-left: 8px; font-family: var(--display); font-weight: 400; font-size: 1.4rem; letter-spacing: 0.04em; color: #fff; }
+.lseg { display: inline-flex; padding: 4px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--line); }
+.lseg button { height: 38px; padding: 0 22px; border-radius: 999px; font-weight: 600; font-size: 0.84rem; color: rgba(255, 255, 255, 0.7); transition: background 0.3s var(--ease), color 0.3s; }
+.lseg button.is-on { background: #fff; color: var(--ink); }
+
+.lineup__grid { display: grid; grid-template-columns: minmax(0, 620px) minmax(0, 1fr); gap: 32px; align-items: start; }
+.lineup__grid.is-list .lineup__pitchwrap { display: none; }
+.lineup__grid.is-list { grid-template-columns: minmax(0, 720px); justify-content: center; }
+
+/* pitch */
+.lpitch { position: relative; aspect-ratio: 100 / 120; border-radius: 22px; overflow: hidden; container-type: inline-size;
+  background: repeating-linear-gradient(180deg, #1f9a43 0 10%, #23a849 10% 20%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 40px 80px -40px rgba(0, 0, 0, 0.9); }
+.lpitch::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 70% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.22)); }
+.lpitch__grass, .lpitch__grass svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.lpitch__label { position: absolute; left: 50%; bottom: 1.6%; transform: translateX(-50%); z-index: 1; font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255, 255, 255, 0.55); white-space: nowrap; }
+
+/* player chip (shirt + name plate) */
+.lchip { position: absolute; z-index: 2; width: clamp(54px, 17.5cqi, 104px); transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; text-align: center; color: var(--ink);
+  animation: chipIn 0.7s var(--ease) both; animation-delay: var(--d, 0ms); }
+.lbench .lchip { position: relative; transform: none; width: clamp(64px, 11vw, 96px); animation-name: chipUp; }
+.lchip__kit { position: relative; width: 74%; transition: transform 0.35s var(--ease), filter 0.35s; filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.35)); }
+.lchip .shirt { display: block; width: 100%; height: auto; }
+.lchip__arm { position: absolute; top: -2px; right: -8%; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+  font-style: normal; font-size: 0.66rem; font-weight: 800; color: var(--ink); background: var(--gold); box-shadow: 0 0 0 2px #fff; }
+.lchip__arm--v { background: #fff; box-shadow: 0 0 0 2px var(--ink); }
+.lchip__plate { width: 100%; margin-top: 3px; border-radius: 7px; overflow: hidden; box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.6); line-height: 1.15; }
+.lchip__plate b { display: block; padding: 4px 4px 3px; background: #fff; font-size: clamp(0.58rem, 2.3cqi, 0.8rem); font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lchip__plate small { display: block; padding: 2px 4px 3px; background: var(--red); color: #fff; font-size: clamp(0.5rem, 1.9cqi, 0.66rem); font-weight: 600; letter-spacing: 0.08em; }
+.lbench .lchip__plate b { font-size: 0.72rem; }
+.lbench .lchip__plate small { font-size: 0.6rem; }
+.lchip:hover .lchip__kit { transform: translateY(-5px) scale(1.06); }
+.lchip--empty .lchip__plate b { background: rgba(255, 255, 255, 0.8); color: var(--grey); }
+.lchip--empty .lchip__plate small { background: rgba(14, 13, 15, 0.55); }
+button.lchip { cursor: pointer; }
+.lchip.is-active .lchip__kit { transform: translateY(-4px) scale(1.08); filter: drop-shadow(0 0 0 #fff) drop-shadow(0 0 10px rgba(255, 212, 0, 0.95)); }
+.lchip.is-active .lchip__plate { box-shadow: 0 0 0 2px var(--gold); }
+@keyframes chipIn { from { opacity: 0; transform: translate(-50%, -30%) scale(0.85); } }
+@keyframes chipUp { from { opacity: 0; transform: translateY(14px); } }
+
+/* bench */
+.lbench { margin-top: 16px; padding: 16px; border-radius: 18px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)); border: 1px solid var(--line); }
+.lbench h4 { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255, 255, 255, 0.6); margin-bottom: 12px; }
+.lbench__row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+/* list view */
+.lineup__list { padding: 22px; border-radius: 22px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--line); }
+.lgroup + .lgroup { margin-top: 18px; }
+.lgroup h4 { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+.lrow { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 12px; transition: background 0.25s; }
+.lrow:hover { background: rgba(255, 255, 255, 0.06); }
+.lrow__n { width: 30px; font-family: var(--display); font-size: 1.15rem; color: var(--gold); text-align: center; }
+.lrow img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; object-position: top; background: rgba(255, 255, 255, 0.1); }
+.lrow__name { display: flex; flex-direction: column; min-width: 0; }
+.lrow__name b { font-weight: 600; font-size: 0.9rem; }
+.lrow__name small { color: rgba(255, 255, 255, 0.5); font-size: 0.74rem; }
+.lrow__tag { margin-left: auto; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 0.68rem; font-weight: 800; background: var(--gold); color: var(--ink); }
+.lrow__tag--v { background: #fff; }
+.lrow--sub { opacity: 0.8; }
+.lineup__capt { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; }
+.lineup__capt b { color: #fff; }
+
+@media (max-width: 980px) {
+  .lineup__grid { grid-template-columns: 1fr; }
+  .lineup__grid.is-pitch .lineup__list { display: none; }
+  .lineup__pitchwrap { max-width: 620px; width: 100%; margin-inline: auto; }
+  .lineup__fixture { align-items: flex-start; }
+  .lineup__fixture small { text-align: left; }
+}
+@media (max-width: 520px) {
+  .lineup { padding: 80px 0 70px; }
+  .lineup .container { width: calc(100% - 20px); }
+  .lineup__teams { gap: 10px; }
+  .lineup__teams b { font-size: 0.86rem; }
+  .lineup__teams img, .lineup__teams .tlogo { width: 30px; height: 30px; }
+  .lpitch { border-radius: 16px; }
+  .lchip__arm { width: 17px; height: 17px; font-size: 0.56rem; }
+  .lbench { padding: 12px 8px; }
+  .lbench__row { gap: 6px; }
+  .lbench .lchip { width: calc(25% - 6px); }
+}
+@media (prefers-reduced-motion: reduce) { .lchip { animation: none; } }

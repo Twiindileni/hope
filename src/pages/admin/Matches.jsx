@@ -4,6 +4,7 @@ import { api } from '../../lib/api.js';
 import { useSite } from '../../lib/SiteContext.jsx';
 import { fmtDate, fmtTime, opponentLogo } from '../../lib/format.js';
 import TeamLogo from '../../components/TeamLogo.jsx';
+import LineupEditor from './LineupEditor.jsx';
 import { PageHead, Modal, Field, ImageInput, Confirm, useAction, Empty } from './ui.jsx';
 
 const blank = () => ({
@@ -82,6 +83,7 @@ export default function Matches() {
   const { data, live } = useSite();
   const [edit, setEdit] = useState(null);
   const [del, setDel] = useState(null);
+  const [xi, setXi] = useState(null);
   const act = useAction();
   const nav = useNavigate();
   const list = [...data.matches].sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -112,6 +114,9 @@ export default function Matches() {
                 {live?.id !== m.id && m.status !== 'finished' && (
                   <button className="btn btn--sm btn--live" onClick={async () => { await act(() => api(`/live/activate/${m.id}`, { method: 'POST' }), 'You are live!'); nav('/admin/live'); }}>Go live</button>
                 )}
+                <button className={`btn btn--sm ${m.lineup?.published ? 'btn--xi' : 'btn--ghost'}`} onClick={() => setXi(m)} title={m.lineup?.published ? 'Lineup is visible on the website' : 'Pick the starting XI'}>
+                  {m.lineup?.published ? '✓ Lineup' : 'Lineup'}
+                </button>
                 <button className="btn btn--sm btn--ghost" onClick={() => setEdit(m)}>Edit</button>
                 <button className="btn btn--sm btn--ghost" onClick={() => setDel(m)}>Delete</button>
               </span>
@@ -120,6 +125,7 @@ export default function Matches() {
         </div>
       )}
 
+      {xi && <LineupEditor match={xi} onClose={() => setXi(null)} />}
       {edit && <MatchForm initial={edit} teams={data.teams || []} onClose={() => setEdit(null)} />}
       {del && (
         <Confirm

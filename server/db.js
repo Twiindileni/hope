@@ -54,6 +54,13 @@ const DB_FILE = path.join(DATA_DIR, 'db.json');
 export const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 if (MODE === 'file') fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
+/** A match as the public may see it: lineups stay hidden until the admin releases them. */
+export function publicMatch(m) {
+  if (!m || !m.lineup || m.lineup.published) return m;
+  const { lineup, ...rest } = m;
+  return rest;
+}
+
 let state = null;
 let pending = Promise.resolve();
 
@@ -68,7 +75,7 @@ async function writeRaw(json) {
   if (MODE === 'redis') {
     const s = JSON.parse(json);
     const live = s.live.matchId ? s.matches.find((m) => m.id === s.live.matchId) || null : null;
-    await Promise.all([redis.set(KEY, s), redis.set(LIVE_KEY, { rev: s.rev, match: live })]);
+    await Promise.all([redis.set(KEY, s), redis.set(LIVE_KEY, { rev: s.rev, match: publicMatch(live) })]);
   } else if (MODE === 'file') {
     const tmp = DB_FILE + '.tmp';
     await fs.promises.writeFile(tmp, json);
@@ -156,7 +163,7 @@ export const db = {
     }
     const s = await db.refresh();
     const live = s.live.matchId ? s.matches.find((m) => m.id === s.live.matchId) || null : null;
-    return { rev: s.rev, match: live };
+    return { rev: s.rev, match: publicMatch(live) };
   },
 };
 

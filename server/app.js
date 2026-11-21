@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import { put } from '@vercel/blob';
-import { db, jwtSecret, UPLOADS_DIR } from './db.js';
+import { db, jwtSecret, UPLOADS_DIR, publicMatch } from './db.js';
 
 // The Express app. server/index.js runs it as a normal Node server;
 // api/index.js hands it to Vercel as a serverless function.
@@ -72,10 +72,10 @@ app.get('/api/site', (req, res) => {
     content: s.content,
     players: [...s.players].sort((a, b) => a.number - b.number),
     staff: s.staff,
-    matches: [...s.matches].sort((a, b) => new Date(a.date) - new Date(b.date)),
+    matches: [...s.matches].sort((a, b) => new Date(a.date) - new Date(b.date)).map(publicMatch),
     teams: s.teams,
     table: s.table,
-    live: liveMatch(),
+    live: publicMatch(liveMatch()),
     rev: s.rev,
     storage: db.mode,
     serverTime: Date.now(),
@@ -225,7 +225,37 @@ crud('matches', 'm', {
     hopeScore: num(m.hopeScore), oppScore: num(m.oppScore), period: str(m.period, 'pre'),
     clock: m.clock || { running: false, base: 0, startedAt: null },
     events: Array.isArray(m.events) ? m.events : [],
+    ...(m.lineup ? { lineup: cleanLineup(m.lineup, m.lineup) } : {}),
   }),
+});
+
+// Starting XI / substitutes for a match. Only shown publicly once `published` is true.
+const FORMATIONS = ['4-4-2', '4-3-3', '4-2-3-1', '4-1-4-1', '4-5-1', '3-5-2', '3-4-3', '5-3-2', '5-4-1'];
+function cleanLineup(l = {}, prev = {}) {
+  const ids = new Set(db.get().players.map((p) => p.id));
+  const starters = Array.from({ length: 11 }, (_, i) => (ids.has(l.starters?.[i]) ? l.starters[i] : ''));
+  const seen = new Set();
+  starters.forEach((id, i) => { if (id && seen.has(id)) starters[i] = ''; else if (id) seen.add(id); });
+  const bench = [];
+  for (const id of Array.isArray(l.bench) ? l.bench : []) {
+    if (ids.has(id) && !seen.has(id) && bench.length < 12) { bench.push(id); seen.add(id); }
+  }
+  const published = !!l.published;
+  return {
+    formation: FORMATIONS.includes(l.formation) ? l.formation : '4-4-2',
+    starters, bench,
+    captain: starters.includes(l.captain) ? l.captain : '',
+    vice: starters.includes(l.vice) && l.vice !== l.captain ? l.vice : '',
+    published,
+    publishedAt: published ? (prev.published ? prev.publishedAt || l.publishedAt || '' : new Date().toISOString()) : '',
+  };
+}
+app.put('/api/matches/:id/lineup', auth, (req, res) => {
+  const m = db.get().matches.find((x) => x.id === req.params.id);
+  if (!m) return res.status(404).json({ error: 'Match not found' });
+  m.lineup = cleanLineup(req.body || {}, m.lineup || {});
+  db.save();
+  res.json(m.lineup);
 });
 app.post('/api/invoices', auth, (req, res, next) => {
   const st = db.get().invoiceSettings;
