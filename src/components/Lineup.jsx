@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useSite } from '../lib/SiteContext.jsx';
 import { fmtDate, fmtTime, opponentLogo } from '../lib/format.js';
 import { formationSlots, roleOf } from '../lib/lineup.js';
-import LineupPitch, { PlayerChip } from './LineupPitch.jsx';
+import LineupPitch, { LineupPitch3D, PlayerChip } from './LineupPitch.jsx';
 import TeamLogo from './TeamLogo.jsx';
 
 /** The match whose released lineup the website should show (live → next → just played). */
@@ -30,7 +30,7 @@ const ROLE_NAME = { GK: 'Goalkeeper', DEF: 'Defence', MID: 'Midfield', FWD: 'Att
 export default function Lineup() {
   const { data, live } = useSite();
   const match = useLineupMatch();
-  const [view, setView] = useState('pitch');
+  const [view, setView] = useState('3d');
   if (!match) return null;
 
   const L = match.lineup;
@@ -62,7 +62,8 @@ export default function Lineup() {
 
         <div className="lineup__bar reveal">
           <div className="lseg" role="tablist">
-            <button className={view === 'pitch' ? 'is-on' : ''} onClick={() => setView('pitch')}>Pitch</button>
+            <button className={view === '3d' ? 'is-on' : ''} onClick={() => setView('3d')}>3D</button>
+            <button className={view === '2d' ? 'is-on' : ''} onClick={() => setView('2d')}>2D</button>
             <button className={view === 'list' ? 'is-on' : ''} onClick={() => setView('list')}>List</button>
           </div>
           <span className="lineup__formation">Formation <b>{L.formation}</b></span>
@@ -70,7 +71,7 @@ export default function Lineup() {
 
         <div className={`lineup__grid reveal is-${view}`}>
           <div className="lineup__pitchwrap">
-            <LineupPitch lineup={L} byId={byId} />
+            {view === '2d' ? <LineupPitch lineup={L} byId={byId} /> : <LineupPitch3D lineup={L} byId={byId} />}
             {bench.length > 0 && (
               <div className="lbench">
                 <h4>Substitutes</h4>
