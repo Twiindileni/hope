@@ -65,11 +65,10 @@ export default function Navbar() {
 
       <div className="nav__drawer" onClick={(e) => e.target === e.currentTarget && go()}>
         <div className="nav__drawer-inner">
-          {LINKS.map(([label, href], i) => (
+          {[...(lineupMatch ? [['Lineup', '#lineup']] : []), ...LINKS, ['Contact', '#contact']].map(([label, href], i) => (
             <a key={href} href={href} onClick={go} style={{ '--i': i }}>{label}</a>
           ))}
-          <a href="#contact" onClick={go} style={{ '--i': 5 }}>Contact</a>
-          <Link to="/admin" onClick={go} className="nav__admin" style={{ '--i': 6 }}>Admin login →</Link>
+          <Link to="/admin" onClick={go} className="nav__admin" style={{ '--i': LINKS.length + 2 }}>Admin login →</Link>
         </div>
       </div>
     </header>
