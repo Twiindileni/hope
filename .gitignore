@@ -9,3 +9,4 @@ server/data/
 /*.jpg
 /*.jpeg
 /*.png
+vite.config.js.timestamp-*

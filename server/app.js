@@ -75,6 +75,7 @@ app.get('/api/site', (req, res) => {
     matches: [...s.matches].sort((a, b) => new Date(a.date) - new Date(b.date)).map(publicMatch),
     teams: s.teams,
     table: s.table,
+    rounds: [...(s.rounds || [])].sort((a, b) => a.round - b.round || String(a.date).localeCompare(String(b.date))),
     live: publicMatch(liveMatch()),
     rev: s.rev,
     storage: db.mode,
@@ -215,6 +216,18 @@ app.put('/api/table', auth, (req, res) => {
   };
   db.save();
   res.json(db.get().table);
+});
+// League results archive — every game of every round (not only Hope's), kept forever.
+const teamName = (id, fallback = '') => db.get().teams.find((t) => t.id === id)?.name || fallback;
+crud('rounds', 'r', {
+  sanitize: (r) => ({
+    round: num(r.round, 1), date: str(r.date), title: str(r.title),
+    games: (Array.isArray(r.games) ? r.games : []).slice(0, 40).map((g) => ({
+      homeId: str(g.homeId), awayId: str(g.awayId),
+      homeName: teamName(g.homeId, str(g.homeName)), awayName: teamName(g.awayId, str(g.awayName)),
+      hs: g.hs === '' || g.hs == null ? null : num(g.hs), as: g.as === '' || g.as == null ? null : num(g.as),
+    })).filter((g) => (g.homeId || g.homeName) && (g.awayId || g.awayName)),
+  }),
 });
 crud('staff', 's', { sanitize: (s) => ({ name: str(s.name), role: str(s.role), photo: str(s.photo) }) });
 crud('matches', 'm', {

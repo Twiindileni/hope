@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { useSite, useReveal } from '../lib/SiteContext.jsx';
+import Navbar from '../components/Navbar.jsx';
 import Hero from '../components/Hero.jsx';
 import Ticker from '../components/Ticker.jsx';
 import Lineup from '../components/Lineup.jsx';
 import Squad from '../components/Squad.jsx';
 import Fixtures from '../components/Fixtures.jsx';
 import Standings from '../components/Standings.jsx';
+import LeagueResults from '../components/LeagueResults.jsx';
 import Club from '../components/Club.jsx';
 import Gallery from '../components/Gallery.jsx';
 import Footer from '../components/Footer.jsx';
@@ -33,12 +35,14 @@ export default function Home() {
 
   return (
     <>
+      <Navbar />
       <Hero />
       <Ticker />
       <Lineup />
       <Squad />
       <Fixtures />
       <Standings />
+      <LeagueResults />
       <Club />
       <Gallery />
       <Footer />

@@ -80,17 +80,42 @@ export function useTick(ms = 1000, active = true) {
   }, [ms, active]);
 }
 
-/** Adds `.in` to elements with `.reveal` when they scroll into view. */
+/**
+ * Adds `.in` to elements with `.reveal` when they scroll into view.
+ * Also keeps working after the page changes: elements that appear later (tab switches, filters)
+ * are watched too, and an element that was already shown stays shown even when React rewrites
+ * its class list (which would otherwise drop `.in` and leave it invisible).
+ */
 export function useReveal(deps = []) {
   useEffect(() => {
-    const els = document.querySelectorAll('.reveal:not(.in)');
-    if (!('IntersectionObserver' in window)) { els.forEach((el) => el.classList.add('in')); return; }
+    const shown = new WeakSet();
+    const show = (el) => { shown.add(el); el.classList.add('in'); };
+    if (!('IntersectionObserver' in window)) {
+      const all = () => document.querySelectorAll('.reveal:not(.in)').forEach(show);
+      all();
+      const mo = new MutationObserver(all);
+      mo.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+      return () => mo.disconnect();
+    }
     const io = new IntersectionObserver(
-      (entries) => entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }),
+      (entries) => entries.forEach((en) => { if (en.isIntersecting) { show(en.target); io.unobserve(en.target); } }),
       { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
     );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    const scan = () => {
+      document.querySelectorAll('.reveal:not(.in)').forEach((el) => {
+        if (shown.has(el)) el.classList.add('in'); // React replaced its classes — put `.in` back
+        else io.observe(el);                       // new element — reveal it when it scrolls into view
+      });
+    };
+    scan();
+    let queued = false;
+    const mo = new MutationObserver(() => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => { queued = false; scan(); });
+    });
+    mo.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+    return () => { mo.disconnect(); io.disconnect(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }

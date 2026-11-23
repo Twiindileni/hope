@@ -7,6 +7,7 @@ const LINKS = [
   ['Squad', '#squad'],
   ['Matches', '#matches'],
   ['Table', '#table'],
+  ['Results', '#results'],
   ['Club', '#club'],
   ['Gallery', '#gallery'],
 ];

@@ -7,6 +7,7 @@ import Overview from './Overview.jsx';
 import LiveControl from './LiveControl.jsx';
 import Matches from './Matches.jsx';
 import League from './League.jsx';
+import Results from './Results.jsx';
 import Players from './Players.jsx';
 import Content from './Content.jsx';
 import Invoices from './Invoices.jsx';
@@ -58,6 +59,7 @@ const NAV = [
   ['live', 'Live Match', '●'],
   ['matches', 'Matches', '⚽'],
   ['league', 'League Table', '☰'],
+  ['results', 'League Results', '▤'],
   ['players', 'Players & Staff', '👥'],
   ['content', 'Website Content', '✎'],
   ['invoices', 'Invoices', '₪'],
@@ -101,6 +103,7 @@ function Shell({ user, onLogout }) {
           <Route path="live" element={<LiveControl />} />
           <Route path="matches" element={<Matches />} />
           <Route path="league" element={<League />} />
+          <Route path="results" element={<Results />} />
           <Route path="players" element={<Players />} />
           <Route path="content" element={<Content />} />
           <Route path="invoices/*" element={<Invoices />} />

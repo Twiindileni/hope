@@ -25,7 +25,7 @@ export const seedPlayers = positions.map((position, i) => ({
 
 // ---------------------------------------------------------------------------
 // FNB Women's Super League 2026/27 — teams, Hope FFC matches and the log
-// (source: NFA league administrator, log & results of 15 Nov 2026,
+// (source: NFA league administrator, log & results of 22 Nov 2026 (rounds 4 & 5),
 //  venue/time change notice of 18 Nov 2026)
 // ---------------------------------------------------------------------------
 const T = (id, name, logo = '') => ({ id, name, logo });
@@ -47,20 +47,20 @@ export const seedTeams = [
 const R = (teamId, p, w, d, l, f, a) => ({ teamId, p, w, d, l, f, a });
 export const seedTable = {
   title: "FNB Women's Super League 2026/27",
-  updated: '15 November 2026',
+  updated: '22 November 2026',
   rows: [
-    R('t-gunners', 3, 3, 0, 0, 14, 3),
-    R('t-unam', 3, 3, 0, 0, 9, 5),
-    R('t-ongos', 3, 2, 1, 0, 13, 4),
-    R('t-arrows', 3, 2, 1, 0, 7, 5),
-    R('t-nampol', 3, 2, 0, 1, 12, 5),
-    R('t-julinho', 3, 1, 1, 1, 5, 4),
-    R('t-pamwe', 3, 1, 1, 1, 4, 4),
-    R('t-angels', 3, 1, 0, 2, 4, 8),
-    R('t-stars', 3, 1, 0, 2, 2, 8),
-    R('t-vpower', 3, 0, 0, 3, 2, 7),
-    R('t-hope', 3, 0, 0, 3, 2, 9),
-    R('t-desert', 3, 0, 0, 3, 2, 14),
+    R('t-gunners', 5, 4, 1, 0, 20, 6),
+    R('t-arrows', 5, 4, 1, 0, 10, 6),
+    R('t-nampol', 5, 4, 0, 1, 15, 5),
+    R('t-unam', 5, 4, 0, 1, 11, 7),
+    R('t-ongos', 5, 3, 1, 1, 17, 7),
+    R('t-angels', 5, 2, 0, 3, 9, 11),
+    R('t-desert', 5, 2, 0, 3, 6, 15),
+    R('t-julinho', 5, 1, 1, 3, 7, 10),
+    R('t-pamwe', 5, 1, 1, 3, 6, 9),
+    R('t-stars', 5, 1, 1, 3, 5, 14),
+    R('t-vpower', 5, 0, 1, 4, 3, 10),
+    R('t-hope', 5, 0, 1, 4, 4, 13),
   ],
 };
 
@@ -73,10 +73,33 @@ export const seedMatches = [
   M('m01', 1, 'Mighty Angels FC', '/images/teams/mighty-angels.png', '2026-11-07T17:00:00+02:00', 'SKGA Sport Stadium, Oshakati', true, 'finished', 0, 3),
   M('m02', 2, 'FC Ongos Ladies', '/images/teams/fc-ongos.png', '2026-11-14T12:00:00+02:00', '', false, 'finished', 1, 4, { timeTbc: true }),
   M('m03', 3, 'Arrows Ladies FC', '/images/teams/arrows.png', '2026-11-15T12:00:00+02:00', '', false, 'finished', 1, 2, { timeTbc: true }),
-  M('m04', 4, 'Desert Queens FC', '', '2026-11-21T11:00:00+02:00', 'Tamariskia Stadium, Swakopmund', false, 'scheduled'),
+  M('m04', 4, 'Desert Queens FC', '', '2026-11-21T11:00:00+02:00', 'Tamariskia Stadium, Swakopmund', false, 'finished', 0, 2),
+  M('m05', 5, 'African Stars Queens FC', '/images/teams/african-stars.png', '2026-11-22T12:00:00+02:00', '', false, 'finished', 2, 2, { timeTbc: true }),
 ];
 
-export const SEED_VERSION = 3;
+// League results archive (all games per round) — source: NFA results of 22 Nov 2026
+const teamNames = Object.fromEntries(seedTeams.map((t) => [t.id, t.name]));
+const G = (homeId, hs, as, awayId) => ({ homeId, awayId, homeName: teamNames[homeId], awayName: teamNames[awayId], hs, as });
+export const seedRounds = [
+  { id: 'r04', round: 4, date: '2026-11-21', title: '', games: [
+    G('t-desert', 2, 0, 't-hope'),
+    G('t-stars', 1, 4, 't-angels'),
+    G('t-nampol', 2, 0, 't-vpower'),
+    G('t-pamwe', 1, 3, 't-ongos'),
+    G('t-gunners', 5, 2, 't-julinho'),
+    G('t-unam', 0, 1, 't-arrows'),
+  ] },
+  { id: 'r05', round: 5, date: '2026-11-22', title: '', games: [
+    G('t-desert', 2, 1, 't-angels'),
+    G('t-stars', 2, 2, 't-hope'),
+    G('t-pamwe', 1, 2, 't-arrows'),
+    G('t-gunners', 1, 1, 't-vpower'),
+    G('t-nampol', 1, 0, 't-julinho'),
+    G('t-unam', 2, 1, 't-ongos'),
+  ] },
+];
+
+export const SEED_VERSION = 4;
 
 export const seed = {
   version: SEED_VERSION,
@@ -143,6 +166,7 @@ export const seed = {
   matches: seedMatches,
   teams: seedTeams,
   table: seedTable,
+  rounds: seedRounds,
   live: { matchId: null },
   invoices: [],
   invoiceSettings: {

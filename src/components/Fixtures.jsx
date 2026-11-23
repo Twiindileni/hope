@@ -14,7 +14,7 @@ function Row({ m, club, data }) {
   ];
   const [a, b] = home ? sides : sides.reverse();
   return (
-    <article className={`fx reveal ${m.status === 'live' ? 'fx--live' : ''}`}>
+    <article className={`fx ${m.status === 'live' ? 'fx--live' : ''}`}>
       <div className="fx__date">
         <b>{fmtDate(m.date, { day: '2-digit' })}</b>
         <span>{fmtDate(m.date, { month: 'short' })}</span>
@@ -75,9 +75,9 @@ export default function Fixtures() {
         </div>
 
         <div className="matches__grid">
-          <div className="fx-list">
+          <div className="fx-list" key={tab}>
             {list.length === 0 && (
-              <p className="empty reveal">
+              <p className="empty">
                 {tab === 'fixtures' ? 'New fixtures will be announced soon.' : 'No results yet this season.'}
               </p>
             )}

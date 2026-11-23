@@ -131,6 +131,29 @@ function migrate(s) {
       for (const m of s.matches || []) if (re.test(m.opponent || '') && !m.opponentLogo) m.opponentLogo = logo;
     }
   }
+  if (v < 4) {
+    // FNB WSL rounds 4 & 5 (official results and log of 22 Nov 2026).
+    // Only fills in what is missing or still pending — players and other edits are untouched.
+    const round = (n) => `Round ${n}`;
+    for (const sm of seedMatches.filter((x) => x.id === 'm04' || x.id === 'm05')) {
+      const n = sm.competition.match(/Round (\d+)/)[1];
+      const m = s.matches.find((x) => x.id === sm.id)
+        || s.matches.find((x) => x.opponent === sm.opponent && (x.competition || '').includes(round(n)))
+        || s.matches.find((x) => x.opponent === sm.opponent && x.status !== 'finished' && x.date.slice(0, 10) === sm.date.slice(0, 10));
+      if (!m) s.matches.push(structuredClone(sm));
+      else if (m.status !== 'finished') {
+        Object.assign(m, { status: 'finished', hopeScore: sm.hopeScore, oppScore: sm.oppScore, period: 'FT',
+          clock: { running: false, base: 0, startedAt: null } });
+        if (s.live?.matchId === m.id) s.live.matchId = null;
+      }
+    }
+    // Replace the log only if it is still from before round 5.
+    if (!s.table?.rows?.length || s.table.rows.every((r) => r.p < 5)) {
+      const ids = new Set((s.teams || []).map((t) => t.id));
+      s.table = { ...structuredClone(seedTable), title: s.table?.title || seedTable.title };
+      s.table.rows = s.table.rows.filter((r) => ids.has(r.teamId));
+    }
+  }
   s.version = SEED_VERSION;
 }
 

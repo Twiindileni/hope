@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSite } from '../lib/SiteContext.jsx';
-import Navbar from './Navbar.jsx';
 import MatchCard from './MatchCard.jsx';
 
 export default function Hero() {
@@ -42,7 +41,6 @@ export default function Hero() {
         <div className="hero__glow" />
       </div>
 
-      <Navbar />
 
       {/* Giant word behind the player */}
       <div className="hero__word" aria-hidden key={`w${index}`}>

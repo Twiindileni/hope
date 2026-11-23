@@ -301,3 +301,24 @@ a.stat:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -18px rgba(0
   .lpick { max-height: 380px; }
 }
 .amodal__box--wide:has(.lineup-ed) { width: min(1060px, 100%); }
+
+/* League results */
+.rgames__h { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--mut); margin: 24px 0 10px; }
+.rgames__h small { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.rgames { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.rgame { display: grid; grid-template-columns: minmax(0, 1fr) 64px 12px 64px minmax(0, 1fr) 32px; gap: 8px; align-items: center; }
+.rgame .num { text-align: center; padding: 0 6px; }
+.rgame > .muted { text-align: center; font-weight: 700; }
+.rlist { display: flex; flex-direction: column; }
+.rlist__row { display: grid; grid-template-columns: minmax(0, 1fr) 80px minmax(0, 1fr); align-items: center; gap: 10px; padding: 9px 10px; border-top: 1px solid var(--bd); border-radius: 10px; }
+.rlist__row b { text-align: center; }
+.rlist__row.is-hope { background: rgba(208, 16, 43, 0.07); }
+.rlist__team { display: flex; align-items: center; gap: 10px; min-width: 0; font-size: 0.88rem; }
+.rlist__team--r { justify-content: flex-end; text-align: right; }
+.rlist__team .tlogo { width: 26px; height: 26px; object-fit: contain; font-size: 0.6rem; flex: none; }
+.panel__head h3 small { font-weight: 500; margin-left: 8px; }
+@media (max-width: 640px) {
+  .rgame { grid-template-columns: 1fr 56px 10px 56px 28px; }
+  .rgame > select:last-of-type { grid-column: 1 / 2; grid-row: 2; }
+  .rlist__row { grid-template-columns: minmax(0, 1fr) 60px minmax(0, 1fr); }
+}
