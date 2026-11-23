@@ -154,6 +154,16 @@ function migrate(s) {
       s.table.rows = s.table.rows.filter((r) => ids.has(r.teamId));
     }
   }
+  if (v < 5) {
+    // FNB WSL rounds 6 & 7 fixtures (NFA, 23 Nov 2026). Adds each Hope match only if it isn't there yet
+    // (same opponent in that round, or on that day) — never changes a match the admin already created.
+    for (const sm of seedMatches.filter((x) => x.id === 'm06' || x.id === 'm07')) {
+      const n = sm.competition.match(/Round (\d+)/)[1];
+      const exists = s.matches.some((x) => x.id === sm.id
+        || (x.opponent === sm.opponent && ((x.competition || '').includes(`Round ${n}`) || (x.date || '').slice(0, 10) === sm.date.slice(0, 10))));
+      if (!exists) s.matches.push(structuredClone(sm));
+    }
+  }
   s.version = SEED_VERSION;
 }
 

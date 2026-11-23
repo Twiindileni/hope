@@ -75,6 +75,9 @@ export const seedMatches = [
   M('m03', 3, 'Arrows Ladies FC', '/images/teams/arrows.png', '2026-11-15T12:00:00+02:00', '', false, 'finished', 1, 2, { timeTbc: true }),
   M('m04', 4, 'Desert Queens FC', '', '2026-11-21T11:00:00+02:00', 'Tamariskia Stadium, Swakopmund', false, 'finished', 0, 2),
   M('m05', 5, 'African Stars Queens FC', '/images/teams/african-stars.png', '2026-11-22T12:00:00+02:00', '', false, 'finished', 2, 2, { timeTbc: true }),
+  // Rounds 6 & 7 — NFA weekly fixtures of 23 Nov 2026
+  M('m06', 6, 'V-Power Angels FC', '/images/teams/vpower-angels.png', '2026-11-28T13:00:00+02:00', 'H.T.S Stadium, Windhoek', false, 'scheduled'),
+  M('m07', 7, 'Millennium Julinho Ladies FC', '/images/teams/julinho.png', '2026-11-29T09:00:00+02:00', 'H.T.S Stadium, Windhoek', false, 'scheduled'),
 ];
 
 // League results archive (all games per round) — source: NFA results of 22 Nov 2026
@@ -99,7 +102,7 @@ export const seedRounds = [
   ] },
 ];
 
-export const SEED_VERSION = 4;
+export const SEED_VERSION = 5;
 
 export const seed = {
   version: SEED_VERSION,
