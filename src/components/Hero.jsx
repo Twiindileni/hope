@@ -80,7 +80,6 @@ export default function Hero() {
       {/* Headline (right) */}
       <div className="hero__copy" key={`c${index}`}>
         <span className="hero__tag">{data.content.league} · {data.content.season}</span>
-        <p className="hero__kicker">{slide.kicker}</p>
         <h1 className="hero__title">{slide.title}</h1>
         <p className="hero__text">{slide.text}</p>
         <div className="hero__cta">

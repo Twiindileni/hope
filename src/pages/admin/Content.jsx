@@ -61,7 +61,7 @@ export default function Content() {
       <section className="panel">
         <div className="panel__head">
           <h3>Hero slides</h3>
-          <button className="btn btn--sm btn--ghost" onClick={() => upd({ slides: [...c.slides, { kicker: `0${c.slides.length + 1}.`, title: 'New slide', text: '', image: '/images/hero-player.png', bigWord: 'HOPE' }] })}>+ Add slide</button>
+          <button className="btn btn--sm btn--ghost" onClick={() => upd({ slides: [...c.slides, { title: 'New slide', text: '', image: '/images/hero-player.png', bigWord: 'HOPE' }] })}>+ Add slide</button>
         </div>
         <p className="muted small">Tip: use cut-out player photos with a transparent background (PNG) for the best effect.</p>
         <div className="slides">
@@ -69,8 +69,7 @@ export default function Content() {
             <div key={i} className="slide-ed">
               <div className="slide-ed__img"><ImageInput value={s.image} onChange={(v) => setSlide(i, { image: v })} contain /></div>
               <div className="form-grid">
-                <Field label="Number"><input className="input" value={s.kicker} onChange={(e) => setSlide(i, { kicker: e.target.value })} /></Field>
-                <Field label="Background word"><input className="input" value={s.bigWord} maxLength={8} onChange={(e) => setSlide(i, { bigWord: e.target.value.toUpperCase() })} /></Field>
+                <Field label="Background word" span={2}><input className="input" value={s.bigWord} maxLength={8} onChange={(e) => setSlide(i, { bigWord: e.target.value.toUpperCase() })} /></Field>
                 <Field label="Title" span={2}><input className="input" value={s.title} onChange={(e) => setSlide(i, { title: e.target.value })} /></Field>
                 <Field label="Text" span={2}><input className="input" value={s.text} onChange={(e) => setSlide(i, { text: e.target.value })} /></Field>
                 <div className="row-end field--span2">
